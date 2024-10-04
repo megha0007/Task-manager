@@ -1,0 +1,13 @@
+version: '3.8'  # Specify the docker-compose version
+
+services:
+  app:  # Define the service name
+    build:
+      context: .  # Use the current directory for the build context
+      dockerfile: Dockerfile  # Specify the Dockerfile
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    ports:
+      - "8000:8000"  # Map port 8000 of the host to port 8000 of the container
+    environment:
+      - PYTHONUNBUFFERED=1  # Ensure logs are output in real-time
