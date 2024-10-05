@@ -4,6 +4,7 @@ from models.user import User  # Adjust import according to your project structur
 from config.database import get_db
 from helpers.common_helper import get_password_hash, verify_password, create_access_token , verify_access_token # Placeholder for your actual helper functions
 from datetime import timedelta
+from fastapi.responses import JSONResponse
 from schemas import UserCreate,UserLogin,UserResponse
 router = APIRouter()
 # User Registration
@@ -12,8 +13,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
     existing_user = db.query(User).filter(User.username == user.username).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists")
-
+        return JSONResponse({'status': 'error', 'error_code': 101, 'message': 'Username already exists'})
     # Hash the password and create the user
     # print(user)
     hashed_password =get_password_hash(user.password)
@@ -23,7 +23,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    return UserResponse(username=new_user.username, email=new_user.email)
+    return JSONResponse({'status': 'success', 'error_code': 0, 'message': 'User regestered successfully.'})
 
 # User Login
 @router.post("/login",tags=['User'])
