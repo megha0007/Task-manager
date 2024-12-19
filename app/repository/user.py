@@ -43,3 +43,12 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
 def protected_resource(current_user: User = Depends(verify_access_token)):
     return {"message": "This is a protected resource.", "user": current_user}
 
+@router.get("/user-profile", tags=['User'])
+def get_user_profile(current_user: User = Depends(verify_access_token)):
+    # Access user.id and other fields
+    return {
+        "user_id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+    }
+

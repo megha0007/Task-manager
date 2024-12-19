@@ -58,6 +58,7 @@ def get_task_route(task_id: int, db: Session = Depends(get_db)):
 @router.get("/tasks/", tags=['Tasks'])
 def get_tasks_route(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), user_id: int = 1):
     tasks = db.query(Task).filter(Task.user_id == user_id).offset(skip).limit(limit).all()
+    
     count_tasks = len(tasks)
     if count_tasks > 0:
         task_data = jsonable_encoder(tasks)
