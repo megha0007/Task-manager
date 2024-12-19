@@ -26,10 +26,35 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # Example of token verification (optional, add as needed)
-def verify_access_token(token: str) -> dict:
+# def verify_access_token(token: str) -> dict:
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         return payload
+#     except JWTError:
+#         raise ValueError("Token is invalid or expired.")
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session 
+from config.database import get_db
+from models.user import User 
+def verify_access_token(token: str, db: Session = Depends(get_db)) -> User:
+    """
+    Verifies the token and returns the corresponding User object.
+    """
     try:
+        # Decode the JWT token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
+        username: str = payload.get("sub")  # 'sub' is the username field in the JWT
+
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        # Fetch the User from the database using the username from the token
+        user = db.query(User).filter(User.username == username).first()
+        
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return user  # Return the User object
+
     except JWTError:
-        raise ValueError("Token is invalid or expired.")
-    
+        raise HTTPException(status_code=401, detail="Could not validate credentials")

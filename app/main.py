@@ -25,7 +25,7 @@ app = FastAPI(dependencies=[Depends(api_key_auth)], title="Task Manager",       
     debug=True)
 
 user.Base.metadata.create_all(bind=engine)
-task.Base.metadata.create_all(bind=engine)
+# task.Base.metadata.create_all(bind=engine)
 @app.exception_handler(RequestValidationError)
 async def custom_form_validation_error(request: Request, exc: RequestValidationError):
     all_error_msgs = []
